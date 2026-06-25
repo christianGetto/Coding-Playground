@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classroom HTML Playground</title>
+  <style>
+    :root{
+      --bg:#071424;--panel:#0d2238;--panel2:#102a45;--line:#25425f;--text:#f3f8ff;--muted:#aac0d5;--accent:#46d5ff;--accent2:#8b5cf6;--ok:#37d67a;--danger:#ff5f6d;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top,#12365a 0,#071424 45%,#030914 100%);color:var(--text);min-height:100vh}
+    header{padding:22px 18px 12px;text-align:center}
+    h1{margin:0;font-size:clamp(28px,6vw,48px);letter-spacing:-.04em}
+    .sub{margin:8px auto 0;color:var(--muted);max-width:760px;font-size:16px;line-height:1.4}
+    main{max-width:1180px;margin:0 auto;padding:12px;display:grid;gap:14px;grid-template-columns:1fr}
+    .card{background:rgba(13,34,56,.92);border:1px solid var(--line);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden}
+    .tools{padding:14px;display:grid;gap:12px}
+    label{font-weight:800;font-size:15px}
+    .upload{border:2px dashed #47708f;border-radius:18px;padding:16px;background:rgba(255,255,255,.04);display:grid;gap:10px;text-align:center}
+    input[type=file]{width:100%;padding:12px;background:#06101e;border:1px solid var(--line);border-radius:14px;color:var(--text)}
+    textarea{width:100%;min-height:310px;resize:vertical;border:1px solid var(--line);border-radius:18px;background:#020813;color:#e9f7ff;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;line-height:1.45;padding:14px;outline:none}
+    textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(70,213,255,.15)}
+    .buttons{display:flex;flex-wrap:wrap;gap:10px}
+    button{appearance:none;border:0;border-radius:15px;padding:13px 16px;font-weight:900;font-size:16px;color:#06101e;background:linear-gradient(135deg,var(--accent),#7df3c6);cursor:pointer;box-shadow:0 10px 25px rgba(70,213,255,.18)}
+    button.secondary{background:#17324f;color:var(--text);box-shadow:none;border:1px solid var(--line)}
+    button.danger{background:#44202b;color:#fff;border:1px solid #763747;box-shadow:none}
+    .hint{color:var(--muted);font-size:14px;line-height:1.4}
+    .previewHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.035)}
+    .previewHead strong{font-size:18px}
+    .previewWrap{padding:14px}
+    iframe{width:100%;height:620px;border:1px solid var(--line);border-radius:18px;background:#fff;display:block}
+    .status{min-height:26px;color:var(--muted);font-size:14px;padding:0 2px}
+    .status.ok{color:var(--ok)}.status.err{color:var(--danger)}
+    .examples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .mini{padding:10px 12px;border-radius:13px;background:#102a45;border:1px solid var(--line);color:var(--text);font-weight:750;font-size:14px;text-align:left}
+    footer{text-align:center;color:var(--muted);font-size:13px;padding:20px}
+    @media(min-width:900px){main{grid-template-columns:440px 1fr}.tools{position:sticky;top:12px}textarea{min-height:430px}iframe{height:720px}}
+    .fullscreen iframe{position:fixed;inset:0;width:100vw;height:100vh;border:0;border-radius:0;z-index:50}.fullscreen .closeFull{display:block}.closeFull{display:none;position:fixed;right:14px;top:14px;z-index:60;background:#000;color:#fff;border:1px solid #fff}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚀 Classroom HTML Playground</h1>
+    <p class="sub">HTML-Datei hochladen oder KI-Code einfügen. Dann auf <b>RUN</b> drücken – die App läuft direkt hier auf dem iPad.</p>
+  </header>
+  <main>
+    <section class="card tools">
+      <div class="upload">
+        <label for="file">📄 HTML-Datei auswählen</label>
+        <input id="file" type="file" accept=".html,.htm,text/html" />
+        <div class="hint">Ideal: eine einzelne <b>index.html</b>. Dateien mit externen Bildern/Sounds brauchen später ZIP-Unterstützung.</div>
+      </div>
+
+      <label for="code">✍️ Oder Code / ChatGPT-Antwort einfügen</label>
+      <textarea id="code" spellcheck="false" placeholder="Füge hier kompletten HTML-Code ein – auch mit ```html Codeblock aus ChatGPT funktioniert."></textarea>
+      <div class="buttons">
+        <button id="run">▶ RUN</button>
+        <button class="secondary" id="sample">✨ Beispiel laden</button>
+        <button class="secondary" id="download">⬇ HTML speichern</button>
+        <button class="danger" id="clear">🧹 Reset</button>
+      </div>
+      <div class="status" id="status">Bereit.</div>
+      <div class="hint"><b>Datenschutz:</b> Alles läuft lokal im Browser. Der Code wird nicht hochgeladen.</div>
+      <div class="examples">
+        <button class="mini" data-template="vocab">📚 Vokabeltrainer</button>
+        <button class="mini" data-template="quiz">❓ Mini-Quiz</button>
+      </div>
+    </section>
+
+    <section class="card" id="previewCard">
+      <div class="previewHead">
+        <strong>📱 Vorschau</strong>
+        <div class="buttons">
+          <button class="secondary" id="rerun">↻ Neu starten</button>
+          <button class="secondary" id="full">⛶ Vollbild</button>
+        </div>
+      </div>
+      <div class="previewWrap">
+        <iframe id="preview" sandbox="allow-scripts allow-forms allow-modals allow-pointer-lock allow-popups allow-downloads"></iframe>
+        <button class="closeFull" id="closeFull">✕ schließen</button>
+      </div>
+    </section>
+  </main>
+  <footer>Für iPad-Klassen · HTML, CSS und JavaScript in einer Datei</footer>
+<script>
+const code = document.getElementById('code');
+const file = document.getElementById('file');
+const preview = document.getElementById('preview');
+const statusBox = document.getElementById('status');
+const previewCard = document.getElementById('previewCard');
+let lastRun = '';
+
+const templates = {
+  vocab: `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vokabeltrainer</title><style>body{font-family:Arial;background:#f5f7ff;text-align:center;padding:30px}.card{max-width:520px;margin:auto;background:white;border-radius:24px;padding:25px;box-shadow:0 10px 30px #0002}button,input{font-size:20px;padding:12px;border-radius:12px;margin:8px}button{background:#2563eb;color:white;border:0}input{border:2px solid #ddd}.ok{color:green}.no{color:red}</style></head><body><div class="card"><h1>📚 Vokabeltrainer</h1><p id="word"></p><input id="answer" placeholder="Englisch"><br><button onclick="check()">Prüfen</button><p id="msg"></p><p>Punkte: <span id="score">0</span></p></div><script>const words=[['Hund','dog'],['Katze','cat'],['Haus','house'],['Schule','school']];let i=0,s=0;function show(){document.getElementById('word').textContent='Übersetze: '+words[i][0];answer.value='';msg.textContent=''}function check(){if(answer.value.trim().toLowerCase()==words[i][1]){s++;msg.textContent='Richtig!';msg.className='ok'}else{msg.textContent='Leider nein: '+words[i][1];msg.className='no'}score.textContent=s;i=(i+1)%words.length;setTimeout(show,900)}show()<\/script></body></html>`,
+  quiz: `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quiz</title><style>body{font-family:Arial;background:linear-gradient(#111827,#1e3a8a);color:white;text-align:center;padding:25px}button{display:block;width:90%;max-width:500px;margin:12px auto;padding:16px;border:0;border-radius:14px;font-size:20px}.box{background:#ffffff18;border:1px solid #ffffff33;border-radius:24px;padding:20px;max-width:650px;margin:auto}</style></head><body><div class="box"><h1>❓ Mini-Quiz</h1><h2 id="q"></h2><div id="a"></div><p id="msg"></p><p>Punkte: <span id="s">0</span></p></div><script>const data=[['Capital of California?',['Los Angeles','Sacramento','San Diego'],1],['English for Schule?',['school','house','dog'],0]];let n=0,p=0;function show(){q.textContent=data[n][0];a.innerHTML='';data[n][1].forEach((x,i)=>{let b=document.createElement('button');b.textContent=x;b.onclick=()=>pick(i);a.appendChild(b)})}function pick(i){if(i===data[n][2]){p++;msg.textContent='✅ richtig'}else msg.textContent='❌ falsch';s.textContent=p;n=(n+1)%data.length;setTimeout(()=>{msg.textContent='';show()},900)}show()<\/script></body></html>`
+};
+
+function setStatus(text,type=''){statusBox.textContent=text;statusBox.className='status '+type;}
+function extractHTML(input){
+  if(!input.trim()) return '';
+  const block = input.match(/```(?:html)?\s*([\s\S]*?)```/i);
+  let out = block ? block[1] : input;
+  const doc = out.match(/<!doctype html[\s\S]*<\/html>/i) || out.match(/<html[\s\S]*<\/html>/i);
+  if(doc) out = doc[0];
+  return out.trim();
+}
+function run(){
+  const html = extractHTML(code.value);
+  if(!html){setStatus('Bitte HTML-Code einfügen oder eine Datei auswählen.','err');return;}
+  lastRun = html;
+  preview.srcdoc = html;
+  localStorage.setItem('classroomPlaygroundCode', code.value);
+  setStatus('Läuft in der Vorschau.','ok');
+}
+file.addEventListener('change', async()=>{
+  const f = file.files[0];
+  if(!f) return;
+  const text = await f.text();
+  code.value = text;
+  setStatus('Datei geladen: '+f.name,'ok');
+  run();
+});
+document.getElementById('run').onclick=run;
+document.getElementById('rerun').onclick=()=>{ if(lastRun){preview.srcdoc=''; setTimeout(()=>preview.srcdoc=lastRun,50)} else run(); };
+document.getElementById('clear').onclick=()=>{code.value='';preview.srcdoc='';localStorage.removeItem('classroomPlaygroundCode');setStatus('Zurückgesetzt.');};
+document.getElementById('sample').onclick=()=>{code.value=templates.vocab;run();};
+document.querySelectorAll('[data-template]').forEach(b=>b.onclick=()=>{code.value=templates[b.dataset.template];run();});
+document.getElementById('download').onclick=()=>{
+  const html = extractHTML(code.value) || '<!DOCTYPE html><html><body></body></html>';
+  const blob = new Blob([html],{type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download='index.html'; a.click();
+  URL.revokeObjectURL(a.href);
+};
+document.getElementById('full').onclick=()=>previewCard.classList.add('fullscreen');
+document.getElementById('closeFull').onclick=()=>previewCard.classList.remove('fullscreen');
+const saved = localStorage.getItem('classroomPlaygroundCode');
+if(saved){code.value=saved;setStatus('Letzter Code wurde geladen.');}
+</script>
+</body>
+</html>
